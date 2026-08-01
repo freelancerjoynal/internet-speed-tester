@@ -36,7 +36,7 @@ export default function SpeedTest() {
   const [displaySpeed, setDisplaySpeed] = useState<number>(0);
   const [speedTrace, setSpeedTrace] = useState<number[]>([]);
   const [showClearPopup, setShowClearPopup] = useState(false);
-  const [selectedFileSize, setSelectedFileSize] = useState<number>(1);
+  const [selectedFileSize, setSelectedFileSize] = useState<number>(1); // Default to 1GB
   
   const [testHistory, setTestHistory] = useState<Array<{
     id: number;
@@ -66,6 +66,7 @@ export default function SpeedTest() {
   const testEndRef = useRef<number>(0);
 
   const fileSizeOptions = [
+    { label: '200 MB', value: 0.2 },
     { label: '1 GB', value: 1 },
     { label: '10 GB', value: 10 },
     { label: '50 GB', value: 50 },
@@ -125,7 +126,7 @@ export default function SpeedTest() {
         totalGB: (totalBytesRef.current / (1024 * 1024 * 1024)).toFixed(3),
         totalMB: totalMB.toFixed(2),
         duration: testDuration,
-        fileSize: `${selectedFileSize} GB`,
+        fileSize: selectedFileSize >= 1 ? `${selectedFileSize} GB` : `${selectedFileSize * 1000} MB`,
       };
 
       const updatedHistory = [entry, ...testHistory].slice(0, 30);
@@ -329,7 +330,7 @@ export default function SpeedTest() {
 
   if (!mounted) return null;
 
-  // Design tokens
+  // Design tokens - perfectly matching dark theme
   const bg = isDark ? 'bg-slate-950' : 'bg-slate-50';
   const text = isDark ? 'text-slate-100' : 'text-slate-900';
   const subtext = isDark ? 'text-slate-500' : 'text-slate-500';
@@ -356,11 +357,17 @@ export default function SpeedTest() {
     ? `0,${traceH} ${tracePoints} ${traceW},${traceH}`
     : '';
 
+  // Helper to format file size label
+  const getFileSizeLabel = (value: number) => {
+    if (value >= 1) return `${value} GB`;
+    return `${value * 1000} MB`;
+  };
+
   return (
     <div className="w-full max-w-4xl">
       {/* Wordmark */}
       <div className="mb-6">
-        <h1 className="text-4xl font-bold tracking-tight">
+        <h1 className="text-4xl font-bold tracking-tight text-slate-100">
           speedtest<span className="text-teal-400">.sg</span>
         </h1>
         <p className={`text-lg ${subtext} mt-1`}>Check your real connection speed, right now.</p>
@@ -483,12 +490,12 @@ export default function SpeedTest() {
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className={`${panel} border ${border} rounded-xl p-4 text-center`}>
           <Timer className="w-6 h-6 text-amber-400 mx-auto mb-1" />
-          <div className="font-mono text-3xl font-bold tabular-nums">{latency}</div>
+          <div className="font-mono text-3xl font-bold tabular-nums text-slate-100">{latency}</div>
           <div className="text-sm uppercase tracking-widest text-slate-500 mt-0.5">Ping (ms)</div>
         </div>
         <div className={`${panel} border ${border} rounded-xl p-4 text-center`}>
           <ArrowDown className="w-6 h-6 text-teal-400 mx-auto mb-1" />
-          <div className="font-mono text-3xl font-bold tabular-nums">{downloadedMB}</div>
+          <div className="font-mono text-3xl font-bold tabular-nums text-slate-100">{downloadedMB}</div>
           <div className="text-sm uppercase tracking-widest text-slate-500 mt-0.5">Downloaded MB</div>
         </div>
       </div>
@@ -497,7 +504,7 @@ export default function SpeedTest() {
       <div className="mb-4">
         <div className="flex flex-wrap items-center gap-3 mb-3">
           <span className={`text-sm font-medium ${subtext}`}>File size:</span>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {fileSizeOptions.map((option) => (
               <button
                 key={option.value}
@@ -505,7 +512,7 @@ export default function SpeedTest() {
                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                   selectedFileSize === option.value
                     ? 'bg-teal-500 text-slate-950'
-                    : `${border} ${isDark ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`
+                    : `border ${border} ${isDark ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-700'}`
                 } ${isTesting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 disabled={isTesting}
               >
@@ -516,7 +523,7 @@ export default function SpeedTest() {
         </div>
         
         <div className="flex justify-between text-base mb-1.5">
-          <span className={subtext}>Downloading {selectedFileSize}GB file</span>
+          <span className={subtext}>Downloading {getFileSizeLabel(selectedFileSize)} file</span>
           <span className="font-mono text-teal-400 text-base">{progress.toFixed(1)}%</span>
         </div>
         <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
@@ -532,22 +539,22 @@ export default function SpeedTest() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
             <div className="text-sm uppercase tracking-widest text-emerald-400 font-semibold mb-0.5">Max</div>
-            <div className="font-mono text-lg font-bold">{maxSpeed} <span className="text-slate-500 font-normal">Mbps</span></div>
+            <div className="font-mono text-lg font-bold text-slate-100">{maxSpeed} <span className="text-slate-500 font-normal">Mbps</span></div>
             <div className="text-sm text-slate-500">at {maxSpeedTime}</div>
           </div>
           <div>
             <div className="text-sm uppercase tracking-widest text-rose-400 font-semibold mb-0.5">Min</div>
-            <div className="font-mono text-lg font-bold">{minSpeed} <span className="text-slate-500 font-normal">Mbps</span></div>
+            <div className="font-mono text-lg font-bold text-slate-100">{minSpeed} <span className="text-slate-500 font-normal">Mbps</span></div>
             <div className="text-sm text-slate-500">at {minSpeedTime}</div>
           </div>
           <div>
             <div className="text-sm uppercase tracking-widest text-slate-400 font-semibold mb-0.5">Average</div>
-            <div className="font-mono text-lg font-bold">{avgSpeed} <span className="text-slate-500 font-normal">Mbps</span></div>
+            <div className="font-mono text-lg font-bold text-slate-100">{avgSpeed} <span className="text-slate-500 font-normal">Mbps</span></div>
             <div className="text-sm text-slate-500">{speedHistoryRef.current.length}s sampled</div>
           </div>
           <div>
             <div className="text-sm uppercase tracking-widest text-slate-400 font-semibold mb-0.5">Total</div>
-            <div className="font-mono text-lg font-bold">{downloadedGB} <span className="text-slate-500 font-normal">GB</span></div>
+            <div className="font-mono text-lg font-bold text-slate-100">{downloadedGB} <span className="text-slate-500 font-normal">GB</span></div>
             <div className="text-sm text-slate-500">{testDuration} elapsed</div>
           </div>
         </div>
@@ -614,7 +621,7 @@ export default function SpeedTest() {
                       className={`border-b ${border} last:border-0 ${isEven ? rowEven : rowOdd}`}
                     >
                       <td className={`py-3 pr-3 font-mono text-sm ${subtext}`}>{index + 1}</td>
-                      <td className="py-3 pr-3 text-base">{test.date}</td>
+                      <td className="py-3 pr-3 text-base text-slate-300">{test.date}</td>
                       <td className="py-3 pr-3 text-sm font-mono text-slate-400">{test.timeRange}</td>
                       <td className="py-3 pr-3 text-right font-mono text-base font-bold text-teal-400">{test.avgSpeed}</td>
                       <td className="py-3 pr-3 text-right font-mono text-base text-emerald-400">{test.maxSpeed}</td>
@@ -651,7 +658,7 @@ export default function SpeedTest() {
               <div className="p-2 rounded-full bg-rose-500/10">
                 <Trash2 className="w-6 h-6 text-rose-400" />
               </div>
-              <h3 className="text-xl font-bold">Clear All History?</h3>
+              <h3 className="text-xl font-bold text-slate-100">Clear All History?</h3>
             </div>
             <p className={`${subtext} text-base mb-6`}>
               This will permanently delete all {testHistory.length} test records from your history. This action cannot be undone.
@@ -659,7 +666,7 @@ export default function SpeedTest() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowClearPopup(false)}
-                className={`flex-1 py-3 rounded-xl border ${border} text-base font-semibold ${isDark ? 'hover:bg-slate-800' : 'hover:bg-slate-100'} transition-colors`}
+                className={`flex-1 py-3 rounded-xl border ${border} text-base font-semibold ${isDark ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-700'} transition-colors`}
               >
                 Cancel
               </button>
