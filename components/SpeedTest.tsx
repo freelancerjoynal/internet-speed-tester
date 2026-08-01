@@ -401,7 +401,7 @@ export default function SpeedTest() {
       {/* Wordmark */}
       <div className="mb-6">
         <h1 className={`text-4xl font-bold tracking-tight ${text}`}>
-          speedtest<span className="text-teal-400">.sg</span>
+          netspeedly<span className="text-teal-400">.com</span>
         </h1>
         <p className={`text-lg ${subtext} mt-1`}>Check your real connection speed, right now.</p>
       </div>

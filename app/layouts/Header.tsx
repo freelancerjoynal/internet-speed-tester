@@ -28,7 +28,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <MapPin className="w-5 h-5 text-teal-400" />
           <span className="text-base font-semibold uppercase tracking-[0.2em] text-teal-400">
-            Singapore
+            Global
           </span>
         </div>
         <div className="flex items-center gap-3">

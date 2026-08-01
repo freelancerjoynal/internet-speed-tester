@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fast net tester",
-  description: "Fast net tester for your network",
+  title: "netspeedly - Speed Test",
+  description: "Test your internet speed with netspeedly. Check your real connection speed right now.",
 };
 
 export default function RootLayout({
